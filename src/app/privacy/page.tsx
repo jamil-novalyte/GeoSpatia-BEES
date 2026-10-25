@@ -83,9 +83,11 @@ export default function PrivacyPage() {
               <li>Any additional notes you choose to include.</li>
             </ul>
             <p className="mt-3">
-              We do <strong className="text-ink">not</strong> collect payment
-              information through this form. Payment, when applicable, is
-              requested separately only after scope confirmation.
+              The request form does <strong className="text-ink">not</strong> collect
+              payment card numbers. If you order online, card checkout is handled
+              by Stripe on Stripe&apos;s hosted page. You can also ask for a written
+              scope check first; in that case payment is requested only after the
+              candidate is confirmed to fit current California BESS coverage.
             </p>
           </section>
 

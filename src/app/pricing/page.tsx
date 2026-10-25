@@ -6,7 +6,7 @@ import { FinalCta } from "@/components/geospatial/final-cta";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Founder-led launch pricing for GeoSpatia Labs preliminary site screens, with scope review before payment.",
+    "Order a California BESS preliminary site screen online. Single site $1,500, 3-site pack $3,750, or a pipeline retainer from $4,000/month. Scope review is available before payment.",
   alternates: {
     canonical: "https://geospatialabs.com/pricing",
   },

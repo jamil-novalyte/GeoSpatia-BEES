@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { SiteHeader } from "@/components/geospatial/site-header";
 import { SiteFooter } from "@/components/geospatial/site-footer";
+import { MobileOrderBar } from "@/components/geospatial/mobile-order-bar";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s · GeoSpatia Labs",
   },
   description:
-    "Source-backed preliminary site screens for California BESS development teams, with founder-led launch pricing from $1,500/site after scope confirmation.",
+    "Source-backed preliminary site screens for California BESS development teams. Order online from $1,500/site, or request a written scope check first.",
   keywords: [
     "site intelligence",
     "preliminary site screening",
@@ -121,6 +122,7 @@ export default function RootLayout({
             <SiteHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />
+            <MobileOrderBar />
           </div>
           <Toaster />
         </ThemeProvider>

@@ -1612,8 +1612,8 @@ export function SampleSiteMapPreview({
                 asChild
                 className="w-full sm:w-auto gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft cursor-pointer text-sm h-10"
               >
-                <Link href={`/request?apn=${encodeURIComponent(currentSite.apn)}&address=${encodeURIComponent(searchQuery || currentSite.name)}`}>
-                  Screen This Candidate Site ($1,500)
+                <Link href={`/pricing?site=${encodeURIComponent(`${searchQuery || currentSite.name} · APN ${currentSite.apn}`)}#single-screen`}>
+                  Order this site — $1,500
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>

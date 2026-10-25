@@ -19,6 +19,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { SampleSiteMapPreview } from "./sample-site-map-preview";
+import { CheckoutButton } from "./checkout-button";
 
 const briefSections = [
   {
@@ -88,6 +89,7 @@ const briefSections = [
 
 export function SamplePreview() {
   const [activeSiteIdx, setActiveSiteIdx] = React.useState(0);
+  const [checkoutError, setCheckoutError] = React.useState<string | null>(null);
 
   return (
     <Section
@@ -173,25 +175,33 @@ export function SamplePreview() {
                 questions to ask formal study engineers and local planning officials.
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center shrink-0 w-full sm:w-auto">
-              <Button
-                asChild
-                className="w-full sm:w-auto gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft cursor-pointer text-sm sm:text-base h-11 sm:h-12"
-              >
-                <Link href="/request">
-                  Reserve a Paid Site Screen
+            <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <CheckoutButton
+                  packageId="single-screen"
+                  source="sample_preview"
+                  onError={setCheckoutError}
+                  className="h-11 w-full gap-2 bg-emerald text-sm text-emerald-foreground hover:bg-emerald-soft sm:h-12 sm:w-auto sm:text-base"
+                >
+                  Order this screen — $1,500
                   <ArrowRight className="size-4 shrink-0" />
-                </Link>
-              </Button>
-              <Button
-                variant="outline"
-                asChild
-                className="w-full sm:w-auto border-line bg-card hover:bg-muted cursor-pointer text-sm sm:text-base h-11 sm:h-12"
-              >
-                <Link href="/sample-report">
-                  View Detailed Brief Guide
-                </Link>
-              </Button>
+                </CheckoutButton>
+                <Button
+                  variant="outline"
+                  asChild
+                  className="h-11 w-full cursor-pointer border-line bg-card text-sm hover:bg-muted sm:h-12 sm:w-auto sm:text-base"
+                >
+                  <Link href="/sample-report">
+                    <FileText className="size-4 shrink-0" />
+                    View the brief guide
+                  </Link>
+                </Button>
+              </div>
+              {checkoutError && (
+                <p className="text-sm text-rose" role="alert">
+                  {checkoutError}
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -26,7 +26,8 @@ export type SafeAnalyticsEvent =
   | "request_form_submitted"
   | "sample_brief_view"
   | "map_search_used"
-  | "methodology_view";
+  | "methodology_view"
+  | "checkout_started";
 
 export interface EventProps {
   project_type?: string;

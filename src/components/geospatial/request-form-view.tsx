@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import { TopographicParcelBg } from "./topographic-bg";
 import { trackEvent, getUtmParams } from "@/lib/analytics";
+import { CheckoutButton } from "./checkout-button";
+import { isCheckoutPackageId, type CheckoutPackageId } from "@/lib/checkout-client";
 
 type FormState = {
   name: string;
@@ -75,6 +77,12 @@ const devStages = [
   "Other",
 ];
 
+const orderPackages: { id: CheckoutPackageId; name: string; price: string; detail: string }[] = [
+  { id: "single-screen", name: "Single site", price: "$1,500", detail: "One California BESS candidate" },
+  { id: "triage-pack", name: "3-site pack", price: "$3,750", detail: "Shortlist, compared side by side" },
+  { id: "pipeline-retainer", name: "Monthly desk", price: "$4,000/mo", detail: "Pipeline retainer, billed monthly" },
+];
+
 export function RequestFormView({ onBack }: { onBack?: () => void } = {}) {
   const [form, setForm] = React.useState<FormState>(empty);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
@@ -82,6 +90,8 @@ export function RequestFormView({ onBack }: { onBack?: () => void } = {}) {
   const [submitted, setSubmitted] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [referenceId, setReferenceId] = React.useState<string | null>(null);
+  const [highlightedPackage, setHighlightedPackage] = React.useState<CheckoutPackageId>("single-screen");
+  const [checkoutError, setCheckoutError] = React.useState<string | null>(null);
 
   const hasTrackedView = React.useRef(false);
   const hasTrackedStarted = React.useRef(false);
@@ -97,9 +107,18 @@ export function RequestFormView({ onBack }: { onBack?: () => void } = {}) {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const loc = params.get("location");
-      if (loc && loc.trim().length > 0) {
-        setForm((prev) => ({ ...prev, siteLocation: loc.trim() }));
+      const packageId = params.get("package");
+      if (isCheckoutPackageId(packageId)) {
+        setHighlightedPackage(packageId);
+      }
+
+      const address = params.get("address")?.trim();
+      const apn = params.get("apn")?.trim();
+      const directLocation = params.get("location")?.trim() || params.get("site")?.trim();
+      const composed = directLocation
+        || [address, apn ? `APN ${apn}` : ""].filter(Boolean).join(" · ");
+      if (composed) {
+        setForm((prev) => ({ ...prev, siteLocation: composed }));
       }
     }
   }, []);
@@ -262,7 +281,7 @@ export function RequestFormView({ onBack }: { onBack?: () => void } = {}) {
           )}
           <div className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-line-soft bg-muted/40 px-2.5 py-1 text-[11px] text-muted-foreground">
             <ShieldCheck className="size-3.5 shrink-0 text-emerald" />
-            <span className="truncate">Scope reviewed before payment</span>
+            <span className="truncate">Pay now, or confirm scope before a charge</span>
           </div>
         </div>
       </div>
@@ -275,21 +294,65 @@ export function RequestFormView({ onBack }: { onBack?: () => void } = {}) {
         <div className="relative mx-auto w-full max-w-[1600px] px-4 min-[375px]:px-5 py-8 sm:py-12 sm:px-6 lg:px-10 xl:px-16 lg:py-16">
           <span className="eyebrow inline-flex items-center gap-2 text-emerald">
             <span className="h-px w-5 bg-emerald/50" />
-            Reserve a Paid Site Screen
+            Start a paid screen
           </span>
           <h1 className="mt-3 display-md text-ink text-balance break-words">
-            Reserve a founder-led California BESS site screen.
+            Pay for a California BESS screen, or check scope first.
           </h1>
           <p className="mt-3 max-w-2xl text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted-foreground text-pretty">
-            Review the sample brief first, then submit the candidate location and
-            decision question. We review scope by email; if it fits current
-            coverage, we send the payment link before research begins. No sales
-            call is required.
+            If the candidate is a California battery-storage site, start Stripe
+            checkout below. Research begins after payment. If coverage is
+            uncertain, use the form — it does not charge a card, and there is
+            no sales call.
           </p>
         </div>
       </header>
 
       <main className="mx-auto w-full max-w-[1600px] px-4 min-[375px]:px-5 py-8 sm:py-10 sm:px-6 lg:px-10 xl:px-16">
+        <section className="surface-card mb-8 p-4 sm:p-6">
+          <h2 className="text-lg font-semibold text-ink">Pay now</h2>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Checkout runs on Stripe. Add the site or APN on the payment page.
+            The brief is preliminary: it does not guarantee interconnection
+            capacity or an approval.
+            {form.siteLocation.trim()
+              ? " The location from this page is attached to the checkout note."
+              : ""}
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+            {orderPackages.map((pkg) => {
+              const active = pkg.id === highlightedPackage;
+              return (
+                <div
+                  key={pkg.id}
+                  className={[
+                    "rounded-lg border p-4",
+                    active ? "border-emerald/50 bg-emerald/5" : "border-line bg-card",
+                  ].join(" ")}
+                >
+                  <p className="text-sm font-semibold text-ink">{pkg.name}</p>
+                  <p className="mt-1 font-serif text-2xl font-semibold text-ink">{pkg.price}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{pkg.detail}</p>
+                  <CheckoutButton
+                    packageId={pkg.id}
+                    candidateSite={form.siteLocation.trim() || undefined}
+                    source="request_pay_now"
+                    onError={setCheckoutError}
+                    className="mt-4 h-11 w-full bg-emerald text-emerald-foreground hover:bg-emerald-soft"
+                  >
+                    {active ? "Continue to checkout" : "Pay this package"}
+                  </CheckoutButton>
+                </div>
+              );
+            })}
+          </div>
+          {checkoutError && (
+            <p className="mt-3 text-sm text-rose" role="alert">
+              {checkoutError}
+            </p>
+          )}
+        </section>
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* What happens next — left rail */}
           <aside className="lg:col-span-4 min-w-0">
@@ -310,13 +373,13 @@ export function RequestFormView({ onBack }: { onBack?: () => void } = {}) {
             >
               <div className="border-b border-line bg-muted/40 px-4 py-4 sm:px-8">
                 <h2 className="text-lg font-semibold text-ink">
-                  Paid site screen scope request
+                  Or request a written scope check
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Fields marked <span className="text-emerald">*</span> are
-                  required. We respond by email with scope fit, timing, and the
-                  correct launch package before any payment is requested — no
-                  call required.
+                  required. This form does not collect payment. We reply by
+                  email if the candidate fits current California BESS coverage.
+                  No call is required.
                 </p>
               </div>
 
@@ -587,8 +650,8 @@ export function RequestFormView({ onBack }: { onBack?: () => void } = {}) {
 
               <div className="flex flex-col items-start justify-between gap-4 border-t border-line bg-muted/30 px-4 py-4 sm:flex-row sm:items-center sm:px-8">
                 <p className="text-xs text-muted-foreground">
-                  Payment is not collected in this form. Launch pricing starts at
-                  $1,500/site after scope confirmation.
+                  This form does not charge a card. Paid screens start at $1,500
+                  and can be ordered above.
                 </p>
                 <Button
                   type="submit"
@@ -753,12 +816,12 @@ function SuccessView({
             <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-emerald/12 text-emerald">
               <CheckCircle2 className="size-9" />
             </div>
-            <h1 className="mt-6 display-md text-ink">Inquiry received.</h1>
+            <h1 className="mt-6 display-md text-ink">Scope request received.</h1>
             <p className="mx-auto mt-4 max-w-xl text-[1.0625rem] leading-relaxed text-muted-foreground">
-              We have received your site screen scope request. The GeoSpatia Labs
-              team will review whether your candidate site fits current
-              California BESS coverage and follow up by email with scope, timing,
-              and payment details if it qualifies. No call is required.
+              The request is saved. GeoSpatia Labs will review whether the
+              candidate fits current California BESS coverage and reply by email.
+              No call is required. If you already know the site is in coverage,
+              you can pay now instead of waiting on that reply.
             </p>
 
             {referenceId && (
@@ -773,19 +836,23 @@ function SuccessView({
             )}
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button
+                asChild
+                className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft cursor-pointer"
+              >
+                <Link href="/pricing#order">Order a site screen</Link>
+              </Button>
               {onBack ? (
                 <Button
+                  variant="outline"
                   onClick={onBack}
-                  className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft cursor-pointer"
+                  className="gap-2 cursor-pointer"
                 >
                   <ArrowLeft className="size-4" />
                   Back to site
                 </Button>
               ) : (
-                <Button
-                  asChild
-                  className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft cursor-pointer"
-                >
+                <Button variant="outline" asChild className="gap-2 cursor-pointer">
                   <Link href="/">
                     <ArrowLeft className="size-4" />
                     Back to site

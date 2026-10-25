@@ -470,15 +470,15 @@ export default function BessSiteScreeningPage() {
                     </p>
                   </Link>
                   <Link
-                    href="/request"
+                    href="/pricing#order"
                     className="rounded-lg border border-line bg-card p-5 transition-colors hover:border-emerald/40"
                   >
                     <ArrowRight className="size-5 text-emerald" />
                     <h3 className="mt-3 text-sm font-semibold text-ink">
-                      Request scope review
+                      Order or check scope
                     </h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      Submit a candidate site and confirm fit before payment.
+                      Pay from $1,500, or confirm coverage before a charge.
                     </p>
                   </Link>
                 </div>
@@ -489,15 +489,14 @@ export default function BessSiteScreeningPage() {
                         Have a candidate parcel, APN, address, or coordinate set?
                       </p>
                       <p className="mt-1 max-w-2xl text-sm leading-7 text-muted-foreground">
-                        Preview the location on the map, then submit it for scope
-                        review. If it fits the current California BESS coverage,
-                        GeoSpatia confirms the research scope before any payment
-                        step.
+                        Order a preliminary California BESS screen from $1,500.
+                        Checkout is on Stripe. If coverage is uncertain, request
+                        a written scope check before any charge.
                       </p>
                     </div>
                     <Button asChild className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft">
-                      <Link href="/request">
-                        Submit a Candidate Site
+                      <Link href="/pricing#order">
+                        Order a site screen
                         <ArrowRight className="size-4" />
                       </Link>
                     </Button>

@@ -15,7 +15,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { packageId } = body as { packageId?: PricingPackageId };
+    const { packageId, candidateSite: rawSite } = body as {
+      packageId?: PricingPackageId;
+      candidateSite?: unknown;
+    };
 
     if (!packageId || !PRICING_PACKAGES[packageId]) {
       return NextResponse.json(
@@ -23,6 +26,11 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const candidateSite =
+      typeof rawSite === "string"
+        ? rawSite.replace(/[\u0000-\u001F]/g, " ").replace(/\s+/g, " ").trim().slice(0, 500)
+        : "";
 
     const pkg = PRICING_PACKAGES[packageId];
 
@@ -47,7 +55,9 @@ export async function POST(req: NextRequest) {
             currency: "usd",
             product_data: {
               name: `GeoSpatia Labs — ${pkg.name}`,
-              description: pkg.description,
+              description: candidateSite
+                ? `${pkg.description} Candidate noted at checkout: ${candidateSite}`.slice(0, 500)
+                : pkg.description,
               images: [logoUrl],
             },
             unit_amount: pkg.amountCents,
@@ -71,11 +81,22 @@ export async function POST(req: NextRequest) {
           optional: true,
         },
       ],
+      custom_text: {
+        submit: {
+          message: candidateSite
+            ? `Candidate: ${candidateSite}. Preliminary California BESS screen only — not an interconnection, capacity, or approval determination. Correct the site in the field above if needed.`.slice(
+                0,
+                1200
+              )
+            : "Preliminary California BESS site screen. Not an interconnection, capacity, or approval determination. Add a candidate site or APN above if you have one.",
+        },
+      },
       success_url: `${origin}/pricing?checkout=success&package=${pkg.id}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/pricing?checkout=cancelled`,
       metadata: {
         packageId: pkg.id,
         packageName: pkg.name,
+        ...(candidateSite ? { candidateSite } : {}),
       },
     });
 

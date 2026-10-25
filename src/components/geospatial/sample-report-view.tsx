@@ -226,8 +226,8 @@ export function SampleReportView() {
               asChild
               className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft cursor-pointer text-xs"
             >
-              <Link href="/request">
-                Reserve a Paid Site Screen
+              <Link href="/pricing#order">
+                Order from $1,500
                 <ArrowRight className="size-3.5" />
               </Link>
             </Button>
@@ -666,7 +666,7 @@ export function SampleReportView() {
                   Evaluate your California BESS candidate location
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
-                  Preview the worked example first, then submit your location online. Launch pricing starts at $1,500/site after written scope confirmation.
+                  The worked example is a preview. A paid California BESS screen starts at $1,500 and is ordered on Stripe. Scope review is available if coverage is uncertain.
                 </p>
               </div>
               <Button
@@ -674,8 +674,8 @@ export function SampleReportView() {
                 asChild
                 className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft shrink-0 cursor-pointer"
               >
-                <Link href="/request">
-                  Reserve a Paid Site Screen
+                <Link href="/pricing#order">
+                  Order a site screen
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
@@ -840,8 +840,9 @@ export function SampleReportView() {
                   Ready to evaluate a California BESS site?
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Submit your candidate location and evaluation question online. We review
-                  scope by email, then confirm the paid engagement before research begins.
+                  Pay $1,500 for one site, or compare the 3-site pack and monthly desk.
+                  Research starts after payment. Ask for a written scope check first if
+                  coverage is uncertain.
                 </p>
               </div>
               <Button
@@ -849,8 +850,8 @@ export function SampleReportView() {
                 asChild
                 className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft shrink-0 cursor-pointer"
               >
-                <Link href="/request">
-                  Reserve a Paid Site Screen
+                <Link href="/pricing#order">
+                  Order a site screen
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>

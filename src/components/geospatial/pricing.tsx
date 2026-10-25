@@ -4,12 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
-  ArrowRight,
   CalendarCheck2,
   CheckCircle2,
   CreditCard,
   FileText,
-  Loader2,
   Lock,
   ShieldCheck,
   XCircle,
@@ -17,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Section, SectionHeading } from "./section";
 import type { PricingPackageId } from "@/lib/stripe";
+import { CheckoutButton } from "./checkout-button";
 
 interface PricingPackageItem {
   id: PricingPackageId;
@@ -27,6 +26,8 @@ interface PricingPackageItem {
   buttonLabel: string;
   description: string;
   items: string[];
+  featured?: boolean;
+  priceNote?: string;
 }
 
 const packages: PricingPackageItem[] = [
@@ -35,8 +36,9 @@ const packages: PricingPackageItem[] = [
     name: "Single Site Screen",
     price: "$1,500",
     cadence: "per candidate site",
-    badge: "Launch offer",
-    buttonLabel: "Order Single Screen",
+    badge: "Start here",
+    buttonLabel: "Pay $1,500",
+    featured: true,
     description:
       "For a team evaluating one California BESS parcel, APN, address, or coordinate set before committing deeper diligence spend.",
     items: [
@@ -53,7 +55,8 @@ const packages: PricingPackageItem[] = [
     price: "$3,750",
     cadence: "three candidate sites",
     badge: "Best for shortlists",
-    buttonLabel: "Order 3-Site Pack",
+    buttonLabel: "Pay $3,750",
+    priceNote: "Three single screens list at $4,500. This pack is $3,750.",
     description:
       "For origination and development teams comparing multiple candidate parcels and deciding where to focus engineering, legal, or interconnection bandwidth.",
     items: [
@@ -70,7 +73,7 @@ const packages: PricingPackageItem[] = [
     price: "From $4,000",
     cadence: "per month",
     badge: "Recurring diligence desk",
-    buttonLabel: "Start Monthly Retainer",
+    buttonLabel: "Start at $4,000/mo",
     description:
       "For teams that need a steady external research desk to organize early evidence across a California BESS candidate pipeline.",
     items: [
@@ -83,23 +86,20 @@ const packages: PricingPackageItem[] = [
   },
 ];
 
-function CheckoutBanner() {
-  const searchParams = useSearchParams();
-  const checkoutStatus = searchParams?.get("checkout");
+function CheckoutBanner({ status }: { status: string | null }) {
+  if (!status) return null;
 
-  if (!checkoutStatus) return null;
-
-  if (checkoutStatus === "success") {
+  if (status === "success") {
     return (
       <div className="mb-8 rounded-xl border border-emerald/40 bg-emerald/10 p-5 text-ink">
         <div className="flex items-start gap-3">
           <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald" />
           <div>
             <p className="text-base font-semibold text-emerald">
-              Payment confirmed! Your diligence order is received.
+              Checkout returned as paid.
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              A receipt and kickoff brief have been dispatched to your email. Our research desk will confirm your candidate parcel scope and begin analysis immediately.
+              Keep the Stripe receipt from the email address you entered. If the candidate site or APN was not on that checkout, send it to admin@geospatialabs.com so the paid screen can be matched to the right parcel. This is a preliminary research order, not an interconnection or approval determination.
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@ function CheckoutBanner() {
     );
   }
 
-  if (checkoutStatus === "cancelled") {
+  if (status === "cancelled") {
     return (
       <div className="mb-8 rounded-xl border border-line bg-card/70 p-4 text-ink">
         <div className="flex items-center gap-3">
@@ -123,46 +123,50 @@ function CheckoutBanner() {
   return null;
 }
 
+function CandidateSiteBanner({ site }: { site: string }) {
+  if (!site) return null;
+
+  return (
+    <div className="mb-8 rounded-xl border border-emerald/30 bg-emerald/10 p-4 sm:p-5 text-ink">
+      <p className="text-sm font-semibold text-emerald">Candidate carried into checkout</p>
+      <p className="mt-1 text-sm leading-relaxed text-ink break-words">{site}</p>
+      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+        Stripe Checkout will show this note before payment. It is a location label, not a feasibility result.{" "}
+        <Link
+          href={`/request?location=${encodeURIComponent(site)}`}
+          className="font-medium text-ink underline underline-offset-2"
+        >
+          Request a scope review for this site instead
+        </Link>
+        .
+      </p>
+    </div>
+  );
+}
+
 export function Pricing() {
-  const [loadingPkg, setLoadingPkg] = React.useState<PricingPackageId | null>(null);
+  return (
+    <React.Suspense fallback={<PricingSection candidateSite="" />}>
+      <PricingFromQuery />
+    </React.Suspense>
+  );
+}
+
+function PricingFromQuery() {
+  const searchParams = useSearchParams();
+  const candidateSite = searchParams?.get("site")?.trim() ?? "";
+  const checkoutStatus = searchParams?.get("checkout") ?? null;
+  return <PricingSection candidateSite={candidateSite} checkoutStatus={checkoutStatus} />;
+}
+
+function PricingSection({
+  candidateSite,
+  checkoutStatus = null,
+}: {
+  candidateSite: string;
+  checkoutStatus?: string | null;
+}) {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-
-  const handleCheckout = async (pkgId: PricingPackageId) => {
-    if (loadingPkg) return;
-    setErrorMsg(null);
-    setLoadingPkg(pkgId);
-
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageId: pkgId }),
-      });
-
-      const data = (await res.json().catch(() => ({}))) as {
-        ok?: boolean;
-        url?: string;
-        error?: string;
-      };
-
-      if (!res.ok || !data.ok || !data.url) {
-        setErrorMsg(
-          data.error ||
-            "Unable to start checkout right now. Please try again or reach out to admin@geospatialabs.com."
-        );
-        return;
-      }
-
-      // Redirect to Stripe hosted checkout page
-      window.location.href = data.url;
-    } catch {
-      setErrorMsg(
-        "A network connection error occurred while contacting the checkout service. Please try again."
-      );
-    } finally {
-      setLoadingPkg(null);
-    }
-  };
 
   return (
     <Section
@@ -174,10 +178,10 @@ export function Pricing() {
       </div>
 
       <div className="relative">
-        {/* Checkout feedback banner with Suspense fallback */}
-        <React.Suspense fallback={null}>
-          <CheckoutBanner />
-        </React.Suspense>
+        <div className="scroll-mt-24">
+          <CheckoutBanner status={checkoutStatus} />
+          <CandidateSiteBanner site={candidateSite} />
+        </div>
 
         {errorMsg && (
           <div className="mb-8 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
@@ -189,8 +193,8 @@ export function Pricing() {
           <div className="lg:col-span-7">
             <SectionHeading
               eyebrow="Founder-led launch pricing"
-              title="Paid preliminary screens, ordered online via Stripe or reserved after scope fit."
-              intro="Review the public sample brief, order directly online with live credit card / Apple Pay checkout, or submit a candidate site first to confirm coverage before payment."
+              title="Order a preliminary California BESS screen. Pay online, or check scope first."
+              intro="Single site $1,500. Three-site pack $3,750. Pipeline desk from $4,000 per month. Card checkout runs on Stripe. If you are unsure the candidate is in coverage, request a written scope check before any charge."
             />
           </div>
           <div className="surface-card lg:col-span-5 p-4 sm:p-5 min-w-0">
@@ -208,13 +212,16 @@ export function Pricing() {
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div id="order" className="mt-10 grid scroll-mt-24 grid-cols-1 gap-5 lg:grid-cols-3">
           {packages.map((pkg) => {
-            const isLoading = loadingPkg === pkg.id;
             return (
               <article
                 key={pkg.id}
-                className="surface-card group flex h-full flex-col overflow-hidden p-5 sm:p-6 transition-all duration-200 hover:border-emerald/40 hover:shadow-sm min-w-0"
+                id={pkg.id}
+                className={[
+                  "surface-card group flex h-full scroll-mt-24 flex-col overflow-hidden p-5 sm:p-6 transition-all duration-200 hover:border-emerald/40 hover:shadow-sm min-w-0",
+                  pkg.featured ? "border-emerald/50 ring-1 ring-emerald/25" : "",
+                ].join(" ")}
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="rounded-full border border-emerald/25 bg-emerald/8 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald">
@@ -233,44 +240,11 @@ export function Pricing() {
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground break-words">
                   {pkg.description}
                 </p>
+                {pkg.priceNote && (
+                  <p className="mt-3 text-xs font-medium leading-relaxed text-ink">{pkg.priceNote}</p>
+                )}
 
-                <div className="mt-6 flex flex-col gap-2.5">
-                  <Button
-                    type="button"
-                    onClick={() => handleCheckout(pkg.id)}
-                    disabled={Boolean(loadingPkg)}
-                    className="w-full gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft cursor-pointer text-sm font-medium h-10 shadow-sm"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="size-4 animate-spin shrink-0" />
-                        Connecting Stripe...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="size-4 shrink-0" />
-                        {pkg.buttonLabel}
-                      </>
-                    )}
-                  </Button>
-
-                  <div className="flex items-center justify-between px-1 text-[11px] text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <Lock className="size-3 text-emerald" />
-                      Encrypted via Stripe
-                    </span>
-                    <Link
-                      href={`/request?package=${pkg.id}`}
-                      className="hover:text-ink underline underline-offset-2 transition-colors"
-                    >
-                      Scope fit first
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="my-6 border-t border-line/60" />
-
-                <ul className="flex-1 space-y-2.5 text-sm leading-relaxed text-muted-foreground">
+                <ul className="mt-6 flex-1 space-y-2.5 text-sm leading-relaxed text-muted-foreground">
                   {pkg.items.map((item) => (
                     <li key={item} className="flex items-start gap-2.5">
                       <span className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald" />
@@ -278,6 +252,34 @@ export function Pricing() {
                     </li>
                   ))}
                 </ul>
+
+                <div className="mt-6 flex flex-col gap-2.5">
+                  <CheckoutButton
+                    packageId={pkg.id}
+                    candidateSite={candidateSite || undefined}
+                    source="pricing_card"
+                    onError={setErrorMsg}
+                    className="h-11 w-full gap-2 bg-emerald text-sm font-medium text-emerald-foreground shadow-sm hover:bg-emerald-soft"
+                  >
+                    <CreditCard className="size-4 shrink-0" />
+                    {pkg.buttonLabel}
+                  </CheckoutButton>
+
+                  <div className="flex items-center justify-between px-1 text-[11px] text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <Lock className="size-3 text-emerald" />
+                      Card checkout on Stripe
+                    </span>
+                    <Link
+                      href={`/request?package=${pkg.id}${
+                        candidateSite ? `&location=${encodeURIComponent(candidateSite)}` : ""
+                      }`}
+                      className="underline underline-offset-2 transition-colors hover:text-ink"
+                    >
+                      Scope review first
+                    </Link>
+                  </div>
+                </div>
               </article>
             );
           })}
@@ -288,20 +290,18 @@ export function Pricing() {
             <div className="flex items-start gap-3 min-w-0">
               <CalendarCheck2 className="mt-0.5 size-5 shrink-0 text-emerald" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-ink">Preview-first or instant checkout workflow</p>
+                <p className="text-sm font-semibold text-ink">Unsure the site is in coverage?</p>
                 <p className="mt-1 max-w-3xl text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">
-                  Developers can order directly with live card / Apple Pay checkout, or submit their candidate parcel first to receive written scope confirmation before any payment. If candidate geography falls outside California BESS coverage, inquiries are declined with no fee.
+                  California BESS candidates can be paid for above. If the parcel, technology, or jurisdiction might sit outside that scope, send it for a written check first. That form does not charge a card. Research starts after a paid kickoff.
                 </p>
               </div>
             </div>
             <Button
               asChild
-              className="w-full sm:w-auto gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft shrink-0 cursor-pointer text-sm sm:text-base h-11 sm:h-12"
+              variant="outline"
+              className="h-11 w-full shrink-0 cursor-pointer border-line bg-card text-sm hover:bg-muted sm:h-12 sm:w-auto sm:text-base"
             >
-              <Link href="/request">
-                Reserve a Paid Site Screen
-                <ArrowRight className="size-4 shrink-0" />
-              </Link>
+              <Link href="/request">Request scope review</Link>
             </Button>
           </div>
         </div>
