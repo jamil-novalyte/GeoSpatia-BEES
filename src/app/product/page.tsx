@@ -3,6 +3,7 @@ import { WhatItBrings } from "@/components/geospatial/what-it-brings";
 import { HowItWorks } from "@/components/geospatial/how-it-works";
 import { CandidateLocatorMap } from "@/components/geospatial/candidate-locator-map";
 import { SamplePreview } from "@/components/geospatial/sample-preview";
+import { Pricing } from "@/components/geospatial/pricing";
 import { FinalCta } from "@/components/geospatial/final-cta";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function ProductPage() {
       <HowItWorks />
       <CandidateLocatorMap />
       <SamplePreview />
+      <Pricing />
       <FinalCta />
     </>
   );

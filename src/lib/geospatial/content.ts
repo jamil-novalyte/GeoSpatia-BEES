@@ -18,7 +18,8 @@ export const footerNav = {
     { label: "How it works", href: "/product#how-it-works" },
     { label: "What a brief covers", href: "/sample-report" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Reserve a paid screen", href: "/request" },
+    { label: "Order a site screen", href: "/pricing#order" },
+    { label: "Request scope review", href: "/request" },
   ],
   Methodology: [
     { label: "Blog", href: "/blog" },

@@ -187,14 +187,14 @@ export default function SolarStorageSiteScreeningPage() {
                     Comparing hybrid solar + storage candidates?
                   </p>
                   <p className="mt-1 max-w-2xl text-sm leading-7 text-muted-foreground">
-                    Submit a parcel, APN, address, or coordinate set. GeoSpatia
-                    can review whether the current source coverage supports a
-                    preliminary screen before any payment step.
+                    A preliminary California screen, including solar-plus-storage
+                    candidates, starts at $1,500. Pay on Stripe, or request a
+                    written scope check first if coverage is uncertain.
                   </p>
                 </div>
                 <Button asChild className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft">
-                  <Link href="/request">
-                    Request Scope Review
+                  <Link href="/pricing#order">
+                    See screen pricing
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>

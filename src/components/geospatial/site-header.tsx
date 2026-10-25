@@ -74,8 +74,8 @@ export function SiteHeader() {
             asChild
             className="gap-1.5 bg-emerald text-emerald-foreground shadow-sm hover:bg-emerald-soft"
           >
-            <Link href="/request">
-              Reserve a Screen
+            <Link href="/pricing#order">
+              Order a screen
               <ArrowRight className="size-3.5" />
             </Link>
           </Button>
@@ -83,6 +83,13 @@ export function SiteHeader() {
 
         {/* Mobile controls */}
         <div className="flex items-center gap-2 md:hidden">
+          <Button
+            size="sm"
+            asChild
+            className="h-10 bg-emerald px-3 text-emerald-foreground hover:bg-emerald-soft"
+          >
+            <Link href="/pricing#order">Order</Link>
+          </Button>
           <ThemeToggle />
           <button
             type="button"
@@ -112,16 +119,16 @@ export function SiteHeader() {
             ))}
             <div className="mt-2 flex flex-col gap-2">
               <Button variant="outline" asChild className="w-full">
-                <Link href="/sample-report" onClick={() => setMobileOpen(false)}>
-                  What a Brief Covers
+                <Link href="/request" onClick={() => setMobileOpen(false)}>
+                  Request scope review
                 </Link>
               </Button>
               <Button
                 asChild
                 className="w-full bg-emerald text-emerald-foreground hover:bg-emerald-soft"
               >
-                <Link href="/request" onClick={() => setMobileOpen(false)}>
-                  Reserve a Paid Site Screen
+                <Link href="/pricing#order" onClick={() => setMobileOpen(false)}>
+                  Order a site screen
                 </Link>
               </Button>
             </div>

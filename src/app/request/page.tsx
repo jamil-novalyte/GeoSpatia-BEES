@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { RequestFormView } from "@/components/geospatial/request-form-view";
 
 export const metadata: Metadata = {
-  title: "Reserve a Paid Preliminary Site Screen",
+  title: "Order or Request a California BESS Site Screen",
   description:
-    "Request a professional preliminary diligence site screen for a candidate California BESS site before committing deeper engineering or interconnection resources.",
+    "Pay for a preliminary California BESS site screen online from $1,500, or send the candidate site for a written scope check before any charge.",
 };
 
 export default function RequestPage() {

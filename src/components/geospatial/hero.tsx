@@ -7,7 +7,6 @@ import {
   ArrowRight,
   FileText,
   ShieldCheck,
-  Compass,
   BatteryCharging,
   SunMedium,
   PlugZap,
@@ -17,9 +16,12 @@ import {
   CheckCircle2,
   HelpCircle,
   MapPin,
+  CreditCard,
+  Clock3,
 } from "lucide-react";
 import { TopographicParcelBg } from "./topographic-bg";
 import { SampleSiteMapPreview } from "./sample-site-map-preview";
+import { CheckoutButton } from "./checkout-button";
 
 const deliverablePreviews = [
   {
@@ -114,8 +116,16 @@ const toneClass = {
   risk: "border-rose-300/40 bg-rose-100/70 text-rose-800",
 } as const;
 
+const heroFacts = [
+  { icon: CreditCard, text: "From $1,500 per site" },
+  { icon: Clock3, text: "5 business days after payment" },
+  { icon: MapPin, text: "California BESS candidates" },
+  { icon: ShieldCheck, text: "No approval or capacity guarantee" },
+];
+
 export function Hero() {
   const [activePreview, setActivePreview] = React.useState(0);
+  const [checkoutError, setCheckoutError] = React.useState<string | null>(null);
   const preview = deliverablePreviews[activePreview];
   const Icon = preview.icon;
 
@@ -143,15 +153,15 @@ export function Hero() {
           <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-line bg-card/80 px-3 py-1.5 text-[10.5px] sm:text-[11px] font-medium uppercase tracking-[0.06em] min-[390px]:tracking-[0.14em] text-emerald shadow-sm backdrop-blur-sm">
             <span className="size-1.5 shrink-0 rounded-full bg-emerald" />
             <span className="truncate min-[420px]:whitespace-normal break-words">
-              Preliminary Site Intelligence for Energy Development
+              California BESS · Preliminary site screens
             </span>
           </div>
 
           <h1 className="mt-4 sm:mt-5 display-xl text-ink text-balance break-words">
-            Know what deserves
+            Screen the site before
             <br className="hidden sm:block" />{" "}
             <span className="relative inline-block text-emerald">
-              a deeper look
+              the next spend.
               <span
                 className="absolute -bottom-1 left-0 h-1.5 w-full rounded-full bg-emerald/30"
                 aria-hidden="true"
@@ -161,51 +171,74 @@ export function Hero() {
                 aria-hidden="true"
               />
             </span>
-            .
           </h1>
 
           <p className="mt-4 sm:mt-6 max-w-xl text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted-foreground text-pretty">
-            GeoSpatia Labs brings together source-backed grid, interconnection,
-            parcel, permitting, environmental, and project context into a
-            manually prepared brief — helping California BESS development teams
-            screen candidate sites before committing deeper engineering or legal
-            spend.
+            A manually prepared brief for California battery-storage teams.
+            Public grid, parcel, permitting, and environmental records — with
+            unknowns left unknown — before engineering, legal, or
+            interconnection spend. Entry screen is $1,500.
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button
-              size="lg"
-              asChild
-              className="w-full sm:w-auto gap-2 bg-emerald text-emerald-foreground shadow-sm hover:bg-emerald-soft cursor-pointer text-sm sm:text-base h-11 sm:h-12"
+            <CheckoutButton
+              packageId="single-screen"
+              source="hero"
+              onError={setCheckoutError}
+              className="w-full sm:w-auto gap-2 bg-emerald text-emerald-foreground shadow-sm hover:bg-emerald-soft text-sm sm:text-base h-11 sm:h-12"
             >
-              <Link href="/request">
-                Reserve a Paid Site Screen
-                <ArrowRight className="size-4 shrink-0" />
-              </Link>
-            </Button>
+              Order site screen — $1,500
+              <ArrowRight className="size-4 shrink-0" />
+            </CheckoutButton>
             <Button
               size="lg"
               variant="outline"
               asChild
               className="w-full sm:w-auto gap-2 border-line bg-card/70 backdrop-blur-sm hover:bg-muted cursor-pointer text-sm sm:text-base h-11 sm:h-12"
             >
-              <Link href="/sample-report">
-                <FileText className="size-4 shrink-0" />
-                What a Brief Covers
+              <Link href="/pricing#order">
+                Compare packages
               </Link>
             </Button>
           </div>
 
-          <div className="mt-5 sm:mt-6 flex flex-col gap-2 min-[480px]:flex-row min-[480px]:flex-wrap min-[480px]:items-center min-[480px]:gap-4 text-xs text-muted-foreground">
-            <div className="inline-flex max-w-full items-center gap-1.5">
-              <ShieldCheck className="size-4 shrink-0 text-emerald" />
-              <span className="break-words">Launch pricing from $1,500/site · Scope reviewed first</span>
-            </div>
-            <div className="inline-flex max-w-full items-center gap-1.5">
-              <Compass className="size-4 shrink-0 text-emerald" />
-              <span className="break-words">Search or drag map pin to evaluate candidate sites</span>
-            </div>
+          {checkoutError && (
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-rose" role="alert">
+              {checkoutError}{" "}
+              <Link href="/request" className="underline underline-offset-2">
+                Request a scope review
+              </Link>{" "}
+              instead.
+            </p>
+          )}
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            <Link
+              href="/sample-report"
+              className="inline-flex items-center gap-1.5 font-medium text-ink underline-offset-4 hover:underline"
+            >
+              <FileText className="size-3.5 text-emerald" />
+              See what a brief covers
+            </Link>
+            <Link
+              href="/request"
+              className="font-medium text-muted-foreground underline-offset-4 hover:text-ink hover:underline"
+            >
+              Not sure it fits? Scope review first
+            </Link>
           </div>
+
+          <ul className="mt-5 sm:mt-6 grid grid-cols-1 gap-2 min-[480px]:grid-cols-2 text-xs text-muted-foreground">
+            {heroFacts.map((fact) => {
+              const FactIcon = fact.icon;
+              return (
+                <li key={fact.text} className="inline-flex min-w-0 items-center gap-1.5">
+                  <FactIcon className="size-4 shrink-0 text-emerald" />
+                  <span className="break-words">{fact.text}</span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
         {/* Right side: rotating deliverable preview */}
@@ -349,6 +382,21 @@ export function Hero() {
                     </span>
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-3.5 flex flex-col gap-2 border-t border-line pt-3.5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  Same deliverable shape as a paid screen. Samples stay preliminary.
+                </p>
+                <CheckoutButton
+                  packageId="single-screen"
+                  source="hero_preview"
+                  onError={setCheckoutError}
+                  className="h-11 w-full shrink-0 gap-2 bg-emerald text-sm text-emerald-foreground hover:bg-emerald-soft sm:w-auto"
+                >
+                  Order a screen like this — $1,500
+                  <ArrowRight className="size-4 shrink-0" />
+                </CheckoutButton>
               </div>
 
               <div className="mt-3.5 sm:mt-4 grid grid-cols-4 gap-2">

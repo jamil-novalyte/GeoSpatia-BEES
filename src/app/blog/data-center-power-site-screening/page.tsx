@@ -171,17 +171,24 @@ export default function DataCenterPowerSiteScreeningPage() {
                     Evaluating a power-constrained land opportunity?
                   </p>
                   <p className="mt-1 max-w-2xl text-sm leading-7 text-muted-foreground">
-                    Submit a candidate location for scope review. GeoSpatia can
-                    confirm whether the source coverage supports a preliminary
-                    screen before any payment step.
+                    Current paid screens are for California BESS candidates, from
+                    $1,500. Data-center power questions should start with a scope
+                    check so an out-of-coverage site is not charged.
                   </p>
                 </div>
-                <Button asChild className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft">
-                  <Link href="/request">
-                    Request Scope Review
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button asChild className="gap-2 bg-emerald text-emerald-foreground hover:bg-emerald-soft">
+                    <Link href="/request">
+                      Request scope review
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="gap-2">
+                    <Link href="/pricing#order">
+                      BESS screen pricing
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </section>

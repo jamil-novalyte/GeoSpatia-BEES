@@ -6,31 +6,31 @@ import { ArrowRight } from "lucide-react";
 const steps = [
   {
     n: "01",
-    title: "Provide the site",
+    title: "Choose a package and pay",
     detail:
-      "Send us a candidate California BESS location — address, APN, parcel, or coordinates. Tell us what you’re evaluating.",
-    tag: "Takes minutes",
+      "Order one site for $1,500, three sites for $3,750, or the monthly desk from $4,000. Card checkout is on Stripe. If coverage is uncertain, request a written scope check first — that form does not charge a card.",
+    tag: "Paid kickoff",
   },
   {
     n: "02",
-    title: "We gather and reconcile evidence",
+    title: "Name the California BESS site",
     detail:
-      "GeoSpatia Labs pulls relevant public-source evidence across grid, parcel, permitting, environmental, and project layers — and reconciles it.",
-    tag: "Identified sources only",
+      "Add the address, APN, parcel, or coordinates at checkout, or include them in the scope form. Tell us the decision the brief should support.",
+    tag: "One candidate context",
   },
   {
     n: "03",
-    title: "Receive a structured brief",
+    title: "We gather public evidence",
     detail:
-      "You get a preliminary intelligence brief: findings, sources, unknowns, conflicts, and next-step questions — clearly separated from analysis.",
-    tag: "Structured + traceable",
+      "After paid kickoff, GeoSpatia Labs assembles grid, parcel, permitting, environmental, and project records from identified public sources and labels what those sources do not show.",
+    tag: "Identified sources only",
   },
   {
     n: "04",
-    title: "Decide where to go deeper",
+    title: "Use the brief to focus spend",
     detail:
-      "Use the brief to direct deeper engineering, interconnection, legal, environmental, or permitting work where it’s actually warranted.",
-    tag: "Focus your diligence",
+      "The preliminary brief separates findings, sources, unknowns, conflicts, and next-step questions so engineering, interconnection, legal, and permitting work goes where it is actually warranted.",
+    tag: "5 business days",
   },
 ];
 
@@ -42,8 +42,8 @@ export function HowItWorks() {
     >
       <SectionHeading
         eyebrow="How it works"
-        title="From candidate site to organized evidence"
-        intro="A focused four-step workflow. We handle the research friction so your team can spend time on the decisions that matter."
+        title="Pay, name the site, then read the public record"
+        intro="Research starts after a paid kickoff. The brief stays preliminary: it organizes identified sources and leaves unknowns labeled."
       />
 
       <ol className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-2 lg:grid-cols-4">

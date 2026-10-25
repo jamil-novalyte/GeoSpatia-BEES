@@ -757,8 +757,8 @@ export function InteractiveLocatorMap({
             asChild
             className="text-xs h-8 gap-1.5 border-line hover:bg-muted"
           >
-            <Link href="/request">
-              Open Request Form Directly
+            <Link href="/pricing#order">
+              Order from $1,500
               <ArrowRight className="size-3.5" />
             </Link>
           </Button>
@@ -873,11 +873,11 @@ export function InteractiveLocatorMap({
                 className="gap-1.5 bg-emerald text-emerald-foreground hover:bg-emerald-soft text-xs font-semibold cursor-pointer shrink-0"
               >
                 <Link
-                  href={`/request?location=${encodeURIComponent(
+                  href={`/pricing?site=${encodeURIComponent(
                     `${selectedLocation.address} (${selectedLocation.coordinates[1].toFixed(5)}°N, ${Math.abs(selectedLocation.coordinates[0]).toFixed(5)}°W)`
-                  )}`}
+                  )}#single-screen`}
                 >
-                  Use in Site Screen Request
+                  Order this site — $1,500
                   <ArrowRight className="size-3" />
                 </Link>
               </Button>
@@ -1248,11 +1248,11 @@ export function InteractiveLocatorMap({
                   className="h-8 gap-1.5 bg-emerald text-xs text-emerald-foreground hover:bg-emerald-soft"
                 >
                   <Link
-                    href={`/request?location=${encodeURIComponent(
+                    href={`/pricing?site=${encodeURIComponent(
                       `${selectedLocation.address} (${selectedLocation.coordinates[1].toFixed(5)}°N, ${Math.abs(selectedLocation.coordinates[0]).toFixed(5)}°W)`
-                    )}`}
+                    )}#single-screen`}
                   >
-                    Continue to no-call order
+                    Order this site — $1,500
                     <ArrowRight className="size-3" />
                   </Link>
                 </Button>
@@ -1335,11 +1335,11 @@ export function InteractiveLocatorMap({
                   className="w-full gap-1.5 bg-emerald text-emerald-foreground hover:bg-emerald-soft text-xs font-semibold cursor-pointer h-8"
                 >
                   <Link
-                    href={`/request?location=${encodeURIComponent(
+                    href={`/pricing?site=${encodeURIComponent(
                       `${selectedLocation.address} (${selectedLocation.coordinates[1].toFixed(5)}°N, ${Math.abs(selectedLocation.coordinates[0]).toFixed(5)}°W)`
-                    )}`}
+                    )}#single-screen`}
                   >
-                    Continue to No-Call Order Flow
+                    Order this site — $1,500
                     <ArrowRight className="size-3" />
                   </Link>
                 </Button>
